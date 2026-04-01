@@ -21,28 +21,15 @@ variables:
   sonarOrganization: 'john19968010'
 
 stages:
-- stage: Build
-  displayName: 'Build and Validation'
+- stage: BuildAndAnalyze
+  displayName: 'Build, Test and Analyze'
   jobs:
-  - job: Validate
-    displayName: 'Lint and Test'
+  - job: ValidateAndScan
+    displayName: 'Lint, Test and SonarCloud'
     steps:
     - checkout: self
       fetchDepth: 0
 
     - template: templates/install-deps.yml
     - template: templates/run-tests.yml
-
-- stage: Analyze
-  displayName: 'Quality Analysis'
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - job: SonarCloud
-    displayName: 'SonarCloud Scan'
-    steps:
-    - checkout: self
-      fetchDepth: 0
-
-    - template: templates/install-deps.yml
     - template: templates/sonarqube-analysis.yml

@@ -1,9 +1,9 @@
 steps:
-- task: SonarCloudPrepare@3
+- task: SonarCloudPrepare@4
   inputs:
     SonarCloud: '$(sonarConnectionName)'
     organization: '$(sonarOrganization)'
-    scannerMode: 'CLI'
+    scannerMode: 'cli'
     configMode: 'manual'
     cliProjectKey: '$(sonarProjectKey)'
     cliProjectName: '$(sonarProjectName)'
@@ -14,10 +14,10 @@ steps:
       sonar.python.coverage.reportPaths=$(System.DefaultWorkingDirectory)/coverage.xml
   displayName: 'Prepare SonarCloud'
 
-- task: SonarCloudAnalyze@3
+- task: SonarCloudAnalyze@4
   displayName: 'Run SonarCloud Analysis'
 
-- task: SonarCloudPublish@3
+- task: SonarCloudPublish@4
   inputs:
     pollingTimeoutSec: '300'
   displayName: 'Publish SonarCloud Results'
