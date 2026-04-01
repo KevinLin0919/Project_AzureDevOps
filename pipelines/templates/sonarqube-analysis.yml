@@ -7,17 +7,16 @@ steps:
     configMode: 'manual'
     cliProjectKey: '$(sonarProjectKey)'
     cliProjectName: '$(sonarProjectName)'
-    cliSources: 'asgards'
+    cliSources: '.'
     extraProperties: |
+      sonar.sources=asgards/src
+      sonar.tests=asgards/tests
       sonar.python.version=3.11
       sonar.python.xunit.reportPath=junit/test-results.xml
       sonar.python.coverage.reportPaths=coverage.xml
-  displayName: 'Prepare SonarCloud'
 
 - task: SonarCloudAnalyze@4
-  displayName: 'Run SonarCloud Analysis'
 
 - task: SonarCloudPublish@4
   inputs:
     pollingTimeoutSec: '300'
-  displayName: 'Publish SonarCloud Results'
