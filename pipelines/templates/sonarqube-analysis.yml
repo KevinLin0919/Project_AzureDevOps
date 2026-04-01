@@ -3,15 +3,15 @@ steps:
   inputs:
     SonarCloud: '$(sonarConnectionName)'
     organization: '$(sonarOrganization)'
-    scannerMode: 'cli'
+    scannerMode: 'CLI'
     configMode: 'manual'
     cliProjectKey: '$(sonarProjectKey)'
     cliProjectName: '$(sonarProjectName)'
     cliSources: 'asgards'
     extraProperties: |
       sonar.python.version=3.11
-      sonar.python.xunit.reportPath=**/test-results.xml
-      sonar.python.coverage.reportPaths=**/coverage.xml
+      sonar.python.xunit.reportPath=$(System.DefaultWorkingDirectory)/junit/test-results.xml
+      sonar.python.coverage.reportPaths=$(System.DefaultWorkingDirectory)/coverage.xml
   displayName: 'Prepare SonarCloud'
 
 - task: SonarCloudAnalyze@3
