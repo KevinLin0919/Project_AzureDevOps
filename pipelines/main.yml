@@ -2,8 +2,14 @@ trigger:
   batch: true
   branches:
     include:
-    - main
-    - '*'
+      - main
+      - '*'
+
+pr:
+  branches:
+    include:
+      - main
+      - '*'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -11,6 +17,8 @@ pool:
 variables:
   sonarConnectionName: 'SonarCloudTest'
   sonarProjectKey: 'john19968010_Kevin_112504009'
+  sonarProjectName: 'Kevin_112504009'
+  sonarOrganization: 'john19968010'
 
 stages:
 - stage: Build
@@ -19,6 +27,9 @@ stages:
   - job: Validate
     displayName: 'Lint and Test'
     steps:
+    - checkout: self
+      fetchDepth: 0
+
     - template: templates/install-deps.yml
     - template: templates/run-tests.yml
 
@@ -27,8 +38,11 @@ stages:
   dependsOn: Build
   condition: succeeded()
   jobs:
-  - job: SonarQube
-    displayName: 'SonarQube Scan'
+  - job: SonarCloud
+    displayName: 'SonarCloud Scan'
     steps:
+    - checkout: self
+      fetchDepth: 0
+
     - template: templates/install-deps.yml
     - template: templates/sonarqube-analysis.yml
