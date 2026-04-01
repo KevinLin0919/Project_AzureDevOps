@@ -1,0 +1,22 @@
+steps:
+- script: |
+    ruff check asgards/
+  displayName: 'Run Linter (Ruff)'
+
+- script: |
+    pytest asgards/tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=asgards/src --cov-report=xml --cov-report=html
+  displayName: 'Run Tests (Pytest)'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-results.xml'
+    testRunTitle: 'Python Tests'
+  displayName: 'Publish test results'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+  displayName: 'Publish code coverage'

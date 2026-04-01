@@ -1,0 +1,10 @@
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.11'
+  displayName: 'Use Python 3.11'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r asgards/requirements.txt
+  displayName: 'Install dependencies'

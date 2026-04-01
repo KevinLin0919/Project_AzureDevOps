@@ -1,0 +1,26 @@
+steps:
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: '$(sonarConnectionName)'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: '$(sonarProjectKey)'
+    cliSources: 'asgards'
+    extraProperties: |
+      sonar.python.version=3.11
+      sonar.python.xunit.reportPath=junit/test-results.xml
+      sonar.python.coverage.reportPaths=coverage.xml
+  displayName: 'Prepare SonarQube'
+
+- task: SonarQubeAnalyze@5
+  displayName: 'Run SonarQube Analysis'
+
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
+  displayName: 'Publish SonarQube Results'
+
+- task: sonar-buildbreaker@8
+  inputs:
+    SonarQube: '$(sonarConnectionName)'
+  displayName: 'Break on Quality Gate'
