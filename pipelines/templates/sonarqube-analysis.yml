@@ -10,8 +10,8 @@ steps:
     cliSources: 'asgards'
     extraProperties: |
       sonar.python.version=3.11
-      sonar.python.xunit.reportPath=junit/test-results.xml
-      sonar.python.coverage.reportPaths=coverage.xml
+      sonar.python.xunit.reportPath=**/test-results.xml
+      sonar.python.coverage.reportPaths=**/coverage.xml
   displayName: 'Prepare SonarCloud'
 
 - task: SonarCloudAnalyze@3

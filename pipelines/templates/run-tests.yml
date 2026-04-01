@@ -5,7 +5,10 @@ steps:
 
 - script: |
     mkdir -p junit
-    pytest asgards/tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=asgards/src --cov-report=xml --cov-report=html
+    pytest asgards/tests/ \
+      --junitxml=junit/test-results.xml \
+      --cov=asgards/src \
+      --cov-report=xml:coverage.xml \
   displayName: 'Run Tests (Pytest)'
 
 - task: PublishTestResults@2
