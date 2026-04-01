@@ -9,8 +9,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  sonarConnectionName: 'sonarqube-server'
-  sonarProjectKey: 'Project_AzureDevops'
+  sonarConnectionName: 'SonarCloudTest'
+  sonarProjectKey: 'john19968010_Kevin_112504009'
 
 stages:
 - stage: Build

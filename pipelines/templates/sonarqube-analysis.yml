@@ -1,7 +1,8 @@
 steps:
-- task: SonarQubePrepare@5
+- task: SonarCloudPrepare@1
   inputs:
-    SonarQube: '$(sonarConnectionName)'
+    SonarCloud: '$(sonarConnectionName)'
+    organization: 'john19968010'   
     scannerMode: 'CLI'
     configMode: 'manual'
     cliProjectKey: '$(sonarProjectKey)'
@@ -10,12 +11,12 @@ steps:
       sonar.python.version=3.11
       sonar.python.xunit.reportPath=junit/test-results.xml
       sonar.python.coverage.reportPaths=coverage.xml
-  displayName: 'Prepare SonarQube'
+  displayName: 'Prepare SonarCloud'
 
-- task: SonarQubeAnalyze@5
-  displayName: 'Run SonarQube Analysis'
+- task: SonarCloudAnalyze@1
+  displayName: 'Run SonarCloud Analysis'
 
-- task: SonarQubePublish@5
+- task: SonarCloudPublish@1
   inputs:
     pollingTimeoutSec: '300'
-  displayName: 'Publish SonarQube Results'
+  displayName: 'Publish SonarCloud Results'
