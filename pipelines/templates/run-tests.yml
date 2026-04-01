@@ -12,6 +12,14 @@ steps:
       --cov-report=html
   displayName: 'Run Tests (Pytest)'
 
+- script: |
+    echo "=== DEBUG FILES ==="
+    pwd
+    ls -al
+    find . -name "coverage.xml"
+    find . -name "test-results.xml"
+  displayName: 'Debug coverage and test reports'
+
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
@@ -22,7 +30,7 @@ steps:
 - task: PublishCodeCoverageResults@2
   condition: succeededOrFailed()
   inputs:
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+    summaryFileLocation: 'coverage.xml'
     pathToSources: '$(System.DefaultWorkingDirectory)/asgards/src'
     failIfCoverageEmpty: false
   displayName: 'Publish code coverage'
