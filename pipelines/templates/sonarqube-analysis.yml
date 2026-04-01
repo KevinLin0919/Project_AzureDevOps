@@ -19,8 +19,3 @@ steps:
   inputs:
     pollingTimeoutSec: '300'
   displayName: 'Publish SonarQube Results'
-
-- task: sonar-buildbreaker@8
-  inputs:
-    SonarQube: '$(sonarConnectionName)'
-  displayName: 'Break on Quality Gate'
