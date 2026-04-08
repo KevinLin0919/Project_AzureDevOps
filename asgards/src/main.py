@@ -11,10 +11,14 @@ def sum_even_numbers(numbers: list[int]) -> int:
     return sum(n for n in numbers if n % 2 == 0)
 
 
-def main():
+def main():  # pragma: no cover
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description="Sum even numbers from a list of integers.")
-    parser.add_argument("numbers", metavar="N", type=int, nargs="*", help="A list of integers.")
+    parser = argparse.ArgumentParser(
+        description="Sum even numbers from a list of integers."
+    )
+    parser.add_argument(
+        "numbers", metavar="N", type=int, nargs="*", help="A list of integers."
+    )
 
     try:
         args = parser.parse_args()
@@ -28,5 +32,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
