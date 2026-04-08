@@ -4,4 +4,4 @@ steps:
     if [ -f benchmark_summary.md ]; then
       echo "##vso[task.uploadsummary]$(pwd)/benchmark_summary.md"
     fi
-  displayName: 'Performance Benchmarking (CPU, Memory, Time, Tokens)'
+  displayName: 'Performance Benchmarking (CPU, Memory, Time)'

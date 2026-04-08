@@ -11,7 +11,7 @@ def sum_even_numbers(numbers: list[int]) -> int:
     return sum(n for n in numbers if n % 2 == 0)
 
 
-def main():  # pragma: no cover
+def main():
     """CLI entry point."""
     parser = argparse.ArgumentParser(
         description="Sum even numbers from a list of integers."
@@ -27,7 +27,7 @@ def main():  # pragma: no cover
     except SystemExit:
         # argparse default behavior for invalid types is SystemExit(2)
         sys.exit(2)
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
