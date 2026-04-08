@@ -1,10 +1,9 @@
-import time
-import subprocess
-import os
+import datetime
 import resource
 import statistics
+import subprocess
 import sys
-import datetime
+import time
 
 
 def benchmark_run(args):
@@ -61,7 +60,7 @@ def main():
     # Generate Markdown Summary for Azure DevOps
     summary_content = f"""
 ## 🚀 Performance Benchmark Summary
-- **Timestamp**: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+- **Timestamp**: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 - **Test Runs**: {runs}
 
 ### 📊 Average Metrics

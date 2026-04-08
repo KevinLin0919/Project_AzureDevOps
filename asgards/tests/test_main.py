@@ -1,6 +1,8 @@
-import pytest
 import sys
-from asgards.src.main import sum_even_numbers, main
+
+import pytest
+
+from asgards.src.main import main, sum_even_numbers
 
 
 @pytest.mark.parametrize(

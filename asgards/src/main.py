@@ -13,12 +13,8 @@ def sum_even_numbers(numbers: list[int]) -> int:
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(
-        description="Sum even numbers from a list of integers."
-    )
-    parser.add_argument(
-        "numbers", metavar="N", type=int, nargs="*", help="A list of integers."
-    )
+    parser = argparse.ArgumentParser(description="Sum even numbers from a list of integers.")
+    parser.add_argument("numbers", metavar="N", type=int, nargs="*", help="A list of integers.")
 
     try:
         args = parser.parse_args()
