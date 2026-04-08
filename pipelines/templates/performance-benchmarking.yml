@@ -1,0 +1,4 @@
+steps:
+- script: |
+    python3 asgards/scripts/benchmark.py
+  displayName: 'Performance Benchmarking (CPU, Memory, Time, Tokens)'

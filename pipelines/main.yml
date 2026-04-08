@@ -32,4 +32,5 @@ stages:
 
     - template: templates/install-deps.yml
     - template: templates/run-tests.yml
+    - template: templates/performance-benchmarking.yml
     - template: templates/sonarqube-analysis.yml

@@ -9,16 +9,23 @@ steps:
       --junitxml=junit/test-results.xml \
       --cov=asgards/src \
       --cov-report=xml:coverage.xml \
-      --cov-report=html
-  displayName: 'Run Tests (Pytest)'
+      --cov-report=term-missing
+  displayName: 'Run Tests & Coverage'
 
 - script: |
-    echo "=== DEBUG FILES ==="
-    pwd
-    ls -al
-    find . -name "coverage.xml"
-    find . -name "test-results.xml"
-  displayName: 'Debug coverage and test reports'
+    echo "=== Test Summary ==="
+    # Simple parsing of junit xml for success rate (optional display)
+    if [ -f junit/test-results.xml ]; then
+      TOTAL=$(grep -oP 'tests="\K[^"]+' junit/test-results.xml | head -1)
+      FAILURES=$(grep -oP 'failures="\K[^"]+' junit/test-results.xml | head -1)
+      ERRORS=$(grep -oP 'errors="\K[^"]+' junit/test-results.xml | head -1)
+      SUCCESS=$((TOTAL - FAILURES - ERRORS))
+      RATE=$(awk "BEGIN {print ($SUCCESS/$TOTAL)*100}")
+      echo "Total Tests: $TOTAL"
+      echo "Passed: $SUCCESS"
+      echo "Success Rate: $RATE%"
+    fi
+  displayName: 'Display Unit Test Success Rate'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
