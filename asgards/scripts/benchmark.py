@@ -36,13 +36,13 @@ def main():
     parser = argparse.ArgumentParser(description="通用效能評測工具")
     parser.add_argument("target", help="要測試的 Python 程式路徑 (例如: main.py)")
     parser.add_argument("-n", "--runs", type=int, default=3, help="執行次數 (預設: 3)")
-    
+
     # 這裡可以選擇是否也要從外部傳入被測試程式的 arguments
     parsed_args = parser.parse_args()
 
     target_script = parsed_args.target
     num_runs = parsed_args.runs
-    
+
     # 被測試程式本身的參數（可視需求修改為動態）
     test_args = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 
@@ -90,7 +90,7 @@ def main():
 """
     with open("benchmark_summary.md", "w", encoding="utf-8") as f:
         f.write(summary_content)
-    print(f"\n報告已生成: benchmark_summary.md")
+    print("\n報告已生成: benchmark_summary.md")
 
 if __name__ == "__main__":
     main()
