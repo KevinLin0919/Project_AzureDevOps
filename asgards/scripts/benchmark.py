@@ -1,10 +1,10 @@
+import argparse
 import datetime
 import resource
 import statistics
 import subprocess
 import sys
 import time
-import argparse # 導入參數解析模組
 
 def benchmark_run(script_path, args):
     """Runs a single pass of the specified script and returns metrics."""
