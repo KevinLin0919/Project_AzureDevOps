@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 
+
 def benchmark_run(script_path, args):
     """Runs a single pass of the specified script and returns metrics."""
     start_time = time.perf_counter()

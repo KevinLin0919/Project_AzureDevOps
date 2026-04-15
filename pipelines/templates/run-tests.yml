@@ -1,5 +1,6 @@
 steps:
 - script: |
+    ruff check --fix asgards/
     ruff check asgards/
   displayName: 'Run Linter (Ruff)'
 
