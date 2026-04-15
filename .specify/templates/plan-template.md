@@ -89,16 +89,6 @@ api/
 
 ios/ or android/
 └── [platform-specific structure: feature modules, UI flows, platform tests]
-
-# [REMOVE IF UNUSED] Option 4: Azure DevOps Pipeline Project
-pipelines/
-├── templates/
-└── main.yml
-
-asgards/
-├── models/
-├── services/
-└── tests/
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real

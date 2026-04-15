@@ -1,6 +1,6 @@
 steps:
 - script: |
-    python3 asgards/scripts/benchmark.py
+    python3 asgards/scripts/benchmark.py asgards/src/main.py -n 5
     if [ -f benchmark_summary.md ]; then
       echo "##vso[task.uploadsummary]$(pwd)/benchmark_summary.md"
     fi
