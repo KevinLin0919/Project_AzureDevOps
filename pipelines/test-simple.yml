@@ -1,0 +1,12 @@
+trigger: none
+
+jobs:
+- job: SimpleTest
+  displayName: 'Simple Test'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: echo "Pipeline is working!"
+    displayName: 'Hello World'
+  - script: python --version
+    displayName: 'Check Python version'

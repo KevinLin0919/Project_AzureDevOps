@@ -4,7 +4,9 @@ import os
 from unittest.mock import MagicMock
 
 from azure.devops.exceptions import AzureDevOpsServiceError
+from dotenv import load_dotenv
 
+load_dotenv()
 os.environ.setdefault("HOME", "/tmp")
 
 

@@ -69,6 +69,6 @@ class ProjectClient:
             self._client.get_project(name)
             return True
         except AzureDevOpsServiceError as e:
-            if getattr(e, "status_code", None) == 404 or "404" in str(e):
+            if getattr(e, "status_code", None) == 404 or "404" in str(e) or "TF200016" in str(e):
                 return False
             raise RuntimeError(f"Failed to check project '{name}': {e}") from e

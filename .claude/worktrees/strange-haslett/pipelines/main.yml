@@ -1,0 +1,36 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - '*'
+
+pr:
+  branches:
+    include:
+      - main
+      - '*'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  sonarConnectionName: 'SonarCloudTest'
+  sonarProjectKey: 'john19968010_Kevin_112504009'
+  sonarProjectName: 'Kevin_112504009'
+  sonarOrganization: 'john19968010'
+
+stages:
+- stage: BuildAndAnalyze
+  displayName: 'Build, Test and Analyze'
+  jobs:
+  - job: ValidateAndScan
+    displayName: 'Lint, Test and SonarCloud'
+    steps:
+    - checkout: self
+      fetchDepth: 0
+
+    - template: templates/install-deps.yml
+    - template: templates/run-tests.yml
+    - template: templates/performance-benchmarking.yml
+    - template: templates/sonarqube-analysis.yml

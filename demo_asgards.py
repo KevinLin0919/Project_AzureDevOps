@@ -10,6 +10,11 @@ Asgards Demo - 完整的 Azure DevOps 自動化流程展示
 """
 
 import os
+import time
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from asgards import (
     BranchClient,
@@ -25,7 +30,7 @@ from asgards import (
 PAT = os.getenv("AZURE_DEVOPS_PAT", "")
 ORG_URL = os.getenv("AZURE_DEVOPS_ORG_URL", "")
 
-PROJECT_NAME = "MyNewProject"
+PROJECT_NAME = "Kevin_test"
 REPO_NAME = "my-service"
 PIPELINE_NAME = "CI Pipeline"
 YAML_PATH = "pipelines/main.yml"
@@ -66,7 +71,8 @@ def demo_project(project_api: ProjectClient) -> str | None:
     else:
         info(f"建立專案 '{PROJECT_NAME}'...")
         project_api.create(PROJECT_NAME, description="Demo project", process_template="Agile")
-        ok(f"專案 '{PROJECT_NAME}' 建立完成（非同步，Azure 需幾秒處理）")
+        ok(f"專案 '{PROJECT_NAME}' 建立完成，等待 Azure 初始化...")
+        time.sleep(10)
 
     project = project_api.get(PROJECT_NAME)
     ok(f"專案 ID: {project.id}")
@@ -93,6 +99,29 @@ def demo_repo(repo_api: RepoClient, project_id: str) -> str | None:
         commit_message="chore: initial commit",
     )
     ok("README.md 推送完成")
+
+    # 推送 pipeline 檔案
+    pipeline_files = [
+        "pipelines/main.yml",
+        "pipelines/test-simple.yml",
+        "pipelines/templates/install-deps.yml",
+        "pipelines/templates/run-tests.yml",
+        "pipelines/templates/performance-benchmarking.yml",
+        "pipelines/templates/sonarqube-analysis.yml",
+    ]
+    for rel_path in pipeline_files:
+        info(f"推送 {rel_path}...")
+        with open(rel_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        repo_api.push_file(
+            PROJECT_NAME,
+            repo.id,
+            f"/{rel_path}",
+            content=content,
+            branch=MAIN_BRANCH,
+            commit_message=f"chore: add {rel_path}",
+        )
+        ok(f"{rel_path} 推送完成")
 
     # 示範：從另一個 Repo 複製檔案
     # info("從來源 Repo 複製 .gitignore...")
@@ -136,7 +165,7 @@ def demo_pipeline(pipeline_api: PipelineClient, repo_id: str) -> int | None:
     """從 YAML 建立 Pipeline 並觸發一次執行。"""
     section("4. Pipeline")
 
-    info(f"建立 Pipeline '{PIPELINE_NAME}' (指向 {YAML_PATH})...")
+    info(f"建立 CI Pipeline '{PIPELINE_NAME}' (指向 {YAML_PATH})...")
     definition = pipeline_api.create_from_yaml(
         PROJECT_NAME,
         PIPELINE_NAME,
@@ -144,14 +173,26 @@ def demo_pipeline(pipeline_api: PipelineClient, repo_id: str) -> int | None:
         YAML_PATH,
         default_branch=MAIN_BRANCH,
     )
-    ok(f"Pipeline 建立完成，Definition ID: {definition.id}")
+    ok(f"CI Pipeline 建立完成，Definition ID: {definition.id}")
 
-    info("觸發第一次 Build...")
-    build = pipeline_api.trigger(PROJECT_NAME, definition.id)
-    ok(f"Build 已排入佇列，Build ID: {build.id}")
+    info("建立 Simple Test Pipeline (指向 pipelines/test-simple.yml)...")
+    simple_def = pipeline_api.create_from_yaml(
+        PROJECT_NAME,
+        "Simple Test Pipeline",
+        repo_id,
+        "pipelines/test-simple.yml",
+        default_branch=MAIN_BRANCH,
+    )
+    ok(f"Simple Test Pipeline 建立完成，Definition ID: {simple_def.id}")
 
-    status = pipeline_api.get_run_status(PROJECT_NAME, build.id)
-    info(f"目前狀態: {status}")
+    info("觸發 Simple Test Pipeline...")
+    try:
+        build = pipeline_api.trigger(PROJECT_NAME, simple_def.id)
+        ok(f"Build 已排入佇列，Build ID: {build.id}")
+        status = pipeline_api.get_run_status(PROJECT_NAME, build.id)
+        info(f"目前狀態: {status}")
+    except RuntimeError as e:
+        info(f"觸發失敗: {e}")
 
     return definition.id
 
@@ -217,7 +258,7 @@ def run_demo() -> None:
     try:
         project_id = demo_project(project_api)
         repo_id = demo_repo(repo_api, project_id)
-        demo_member(member_api, project_id)
+        # demo_member(member_api, project_id)  # 需填入 org 內的真實 email 才能測試
         demo_pipeline(pipeline_api, repo_id)
         demo_release(release_api)
         demo_branch(branch_api, repo_id)

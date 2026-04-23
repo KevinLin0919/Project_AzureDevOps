@@ -34,7 +34,7 @@ class ReleaseClient:
             ),
             "days_to_keep": default_policy.days_to_keep if default_policy else None,
             "maximum_days_to_keep": maximum_policy.days_to_keep if maximum_policy else None,
-            "maximum_runs_to_keep": maximum_policy.minimum_to_keep if maximum_policy else None,
+            "maximum_runs_to_keep": default_policy.minimum_to_keep if default_policy else None,
             "retain_associated_build": (
                 not default_policy.delete_build_record if default_policy else None
             ),
@@ -76,6 +76,8 @@ class ReleaseClient:
         if settings.default_retention_policy:
             if days_to_keep is not None:
                 settings.default_retention_policy.days_to_keep = days_to_keep
+            if maximum_runs_to_keep is not None:
+                settings.default_retention_policy.minimum_to_keep = maximum_runs_to_keep
             if retain_associated_build is not None:
                 settings.default_retention_policy.delete_build_record = (
                     not retain_associated_build
@@ -84,8 +86,6 @@ class ReleaseClient:
         if settings.maximum_retention_policy:
             if maximum_days_to_keep is not None:
                 settings.maximum_retention_policy.days_to_keep = maximum_days_to_keep
-            if maximum_runs_to_keep is not None:
-                settings.maximum_retention_policy.minimum_to_keep = maximum_runs_to_keep
 
         try:
             self._client.update_build_settings(settings, project)

@@ -1,0 +1,44 @@
+steps:
+- script: |
+    ruff check --fix asgards/
+    ruff check asgards/
+  displayName: 'Run Linter (Ruff)'
+
+- script: |
+    mkdir -p junit
+    pytest asgards/tests/ \
+      --junitxml=junit/test-results.xml \
+      --cov=asgards/src \
+      --cov-report=xml:coverage.xml \
+      --cov-report=term-missing
+  displayName: 'Run Tests & Coverage'
+
+- script: |
+    echo "=== Test Summary ==="
+    # Simple parsing of junit xml for success rate (optional display)
+    if [ -f junit/test-results.xml ]; then
+      TOTAL=$(grep -oP 'tests="\K[^"]+' junit/test-results.xml | head -1)
+      FAILURES=$(grep -oP 'failures="\K[^"]+' junit/test-results.xml | head -1)
+      ERRORS=$(grep -oP 'errors="\K[^"]+' junit/test-results.xml | head -1)
+      SUCCESS=$((TOTAL - FAILURES - ERRORS))
+      RATE=$(awk "BEGIN {print ($SUCCESS/$TOTAL)*100}")
+      echo "Total Tests: $TOTAL"
+      echo "Passed: $SUCCESS"
+      echo "Success Rate: $RATE%"
+    fi
+  displayName: 'Display Unit Test Success Rate'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-results.xml'
+    testRunTitle: 'Python Tests'
+  displayName: 'Publish test results'
+
+- task: PublishCodeCoverageResults@2
+  condition: succeededOrFailed()
+  inputs:
+    summaryFileLocation: 'coverage.xml'
+    pathToSources: '$(System.DefaultWorkingDirectory)/asgards/src'
+    failIfCoverageEmpty: false
+  displayName: 'Publish code coverage'

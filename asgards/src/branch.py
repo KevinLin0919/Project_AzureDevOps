@@ -7,8 +7,8 @@ from azure.devops.v7_1.policy.models import PolicyConfiguration, PolicyType
 from asgards.src._auth import _build_connection
 
 POLICY_WORK_ITEM_LINKING = "40e92b44-2fe1-4dd6-b3d8-74a9c21d0c6e"
-POLICY_COMMENT_REQUIREMENTS = "c6a1889d-b943-4856-b76f-9e46bb6b0df3"
-POLICY_MERGE_STRATEGY = "fa4e907d-c16b-452d-8106-7efa0cb84489"
+POLICY_COMMENT_REQUIREMENTS = "c6a1889d-b943-4856-b76f-9e46bb6b0df2"
+POLICY_MERGE_STRATEGY = "fa4e907d-c16b-4a4c-9dfa-4916e5d171ab"
 
 _NULL_SHA = "0000000000000000000000000000000000000000"
 
