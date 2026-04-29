@@ -32,7 +32,7 @@ def test_group_name_constants():
 def test_find_group_returns_matching_group(mock_graph):
     group = _make_group("Project Administrators")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group, _make_group("Other")])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group, _make_group("Other")])
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     result = client.find_group("proj-id", "Project Administrators")
     assert result.display_name == "Project Administrators"
@@ -40,7 +40,7 @@ def test_find_group_returns_matching_group(mock_graph):
 
 def test_find_group_raises_when_not_found(mock_graph):
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[_make_group("Contributors")])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[_make_group("Contributors")])
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     with pytest.raises(RuntimeError, match="not found"):
         client.find_group("proj-id", "Admins")
@@ -56,9 +56,9 @@ def test_find_group_raises_runtime_error_on_service_error(mock_graph):
 def test_add_calls_add_member_to_group(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     user = MagicMock(mail_address="alice@example.com", descriptor="user-desc")
-    mock_graph.list_users.return_value = MagicMock(value=[user])
+    mock_graph.list_users.return_value = MagicMock(graph_users=[user])
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     client.add("proj-id", "Contributors", "alice@example.com")
     mock_graph.add_membership.assert_called_once_with("user-desc", group.descriptor)
@@ -66,11 +66,11 @@ def test_add_calls_add_member_to_group(mock_graph):
 
 def test_add_uses_continuation_token_to_find_user_on_later_page(mock_graph):
     group = _make_group("Contributors")
-    first_page = MagicMock(value=[], continuation_token="next-page")
+    first_page = MagicMock(graph_users=[], continuation_token="next-page")
     user = MagicMock(mail_address="alice@example.com", descriptor="user-desc")
-    second_page = MagicMock(value=[user], continuation_token=None)
+    second_page = MagicMock(graph_users=[user], continuation_token=None)
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     mock_graph.list_users.side_effect = [first_page, second_page]
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     client.add("proj-id", "Contributors", "alice@example.com")
@@ -82,8 +82,8 @@ def test_add_uses_continuation_token_to_find_user_on_later_page(mock_graph):
 def test_add_raises_runtime_error_when_user_not_found(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
-    mock_graph.list_users.return_value = MagicMock(value=[])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
+    mock_graph.list_users.return_value = MagicMock(graph_users=[])
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     with pytest.raises(RuntimeError, match="User 'alice@example.com' not found"):
         client.add("proj-id", "Contributors", "alice@example.com")
@@ -92,7 +92,7 @@ def test_add_raises_runtime_error_when_user_not_found(mock_graph):
 def test_add_raises_runtime_error_when_list_users_fails(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     mock_graph.list_users.side_effect = make_service_error("user lookup failed")
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     with pytest.raises(RuntimeError, match="Failed to list users"):
@@ -102,9 +102,9 @@ def test_add_raises_runtime_error_when_list_users_fails(mock_graph):
 def test_add_raises_runtime_error_on_membership_error(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     user = MagicMock(mail_address="alice@example.com", descriptor="user-desc")
-    mock_graph.list_users.return_value = MagicMock(value=[user])
+    mock_graph.list_users.return_value = MagicMock(graph_users=[user])
     mock_graph.add_membership.side_effect = make_service_error("add failed")
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     with pytest.raises(RuntimeError, match="Failed to add 'alice@example.com'"):
@@ -114,9 +114,9 @@ def test_add_raises_runtime_error_on_membership_error(mock_graph):
 def test_remove_calls_remove_member_from_group(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     user = MagicMock(mail_address="bob@example.com", descriptor="user-desc-bob")
-    mock_graph.list_users.return_value = MagicMock(value=[user])
+    mock_graph.list_users.return_value = MagicMock(graph_users=[user])
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     client.remove("proj-id", "Contributors", "bob@example.com")
     mock_graph.remove_membership.assert_called_once_with("user-desc-bob", group.descriptor)
@@ -125,9 +125,9 @@ def test_remove_calls_remove_member_from_group(mock_graph):
 def test_remove_raises_runtime_error_on_membership_error(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     user = MagicMock(mail_address="bob@example.com", descriptor="user-desc-bob")
-    mock_graph.list_users.return_value = MagicMock(value=[user])
+    mock_graph.list_users.return_value = MagicMock(graph_users=[user])
     mock_graph.remove_membership.side_effect = make_service_error("remove failed")
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     with pytest.raises(RuntimeError, match="Failed to remove 'bob@example.com'"):
@@ -137,7 +137,7 @@ def test_remove_raises_runtime_error_on_membership_error(mock_graph):
 def test_list_members_calls_list_memberships(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     membership_1 = MagicMock(member_descriptor="user-1")
     membership_2 = MagicMock(member_descriptor="user-2")
     user_1 = MagicMock(principal_name="alice@example.com")
@@ -156,7 +156,7 @@ def test_list_members_calls_list_memberships(mock_graph):
 def test_list_members_raises_runtime_error_on_service_error(mock_graph):
     group = _make_group("Contributors")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     mock_graph.list_memberships.side_effect = make_service_error("list failed")
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
     with pytest.raises(RuntimeError, match="Failed to list members of 'Contributors'"):
@@ -167,7 +167,7 @@ def test_list_members_raises_runtime_error_when_member_lookup_fails(mock_graph):
     group = _make_group("Contributors")
     membership = MagicMock(member_descriptor="user-1")
     mock_graph.get_descriptor.return_value = MagicMock(value="scope-descriptor")
-    mock_graph.list_groups.return_value = MagicMock(value=[group])
+    mock_graph.list_groups.return_value = MagicMock(graph_groups=[group])
     mock_graph.list_memberships.return_value = [membership]
     mock_graph.get_user.side_effect = make_service_error("lookup failed")
     client = MemberClient(pat="x", org_url="https://dev.azure.com/org")
