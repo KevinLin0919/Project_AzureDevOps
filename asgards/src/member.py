@@ -28,7 +28,7 @@ class MemberClient:
         try:
             descriptor = self._graph_client.get_descriptor(project_id)
             groups = self._graph_client.list_groups(scope_descriptor=descriptor.value)
-            for group in groups.value or []:
+            for group in groups.graph_groups or []:
                 if group.display_name == group_display_name:
                     return group
         except AzureDevOpsServiceError as e:
@@ -41,7 +41,7 @@ class MemberClient:
         try:
             while True:
                 result = self._graph_client.list_users(continuation_token=continuation_token)
-                for user in result.value or []:
+                for user in result.graph_users or []:
                     if user.mail_address == user_email or user.principal_name == user_email:
                         return user.descriptor
                 continuation_token = getattr(result, "continuation_token", None)

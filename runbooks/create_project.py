@@ -15,8 +15,11 @@ create_project runbook
 
 import argparse
 import os
+import sys
 import time
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
 
@@ -85,9 +88,14 @@ def _create_project(project_api: ProjectClient, project_name: str) -> str:
 
 def _create_repo(repo_api: RepoClient, project_name: str) -> str:
     _section("2. 建立 Repo")
-    _info(f"建立 Repo '{project_name}'...")
-    repo = repo_api.create(project_name, project_name)
-    _ok(f"Repo 建立完成，ID: {repo.id}")
+    try:
+        repo = repo_api.get(project_name, project_name)
+        _info(f"Repo '{project_name}' 已存在（Azure 自動建立），直接使用")
+        _ok(f"Repo ID: {repo.id}")
+    except RuntimeError:
+        _info(f"建立 Repo '{project_name}'...")
+        repo = repo_api.create(project_name, project_name)
+        _ok(f"Repo 建立完成，ID: {repo.id}")
 
     _info("初始化 main branch (README.md)...")
     repo_api.push_file(
