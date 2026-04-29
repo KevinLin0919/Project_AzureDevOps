@@ -1,11 +1,14 @@
 """Azure DevOps Team and member management operations."""
 
 from azure.devops.exceptions import AzureDevOpsServiceError
+from azure.devops.v7_1.graph.models import GraphGroup
 
 from asgards.src._auth import _build_connection
 
 GROUP_PROJECT_ADMINISTRATORS = "Project Administrators"
 GROUP_CONTRIBUTORS = "Contributors"
+GROUP_PROJECT_MANAGER = "ProjectManager"
+GROUP_PROJECT_MEMBER = "ProjectMember"
 
 
 class MemberClient:
@@ -69,6 +72,22 @@ class MemberClient:
             raise RuntimeError(
                 f"Failed to remove '{user_email}' from '{group_display_name}': {e}"
             ) from e
+
+    def get_or_create_group(self, project_id: str, group_display_name: str, description: str = ""):
+        """Return the named group, creating it first if it does not exist."""
+        try:
+            return self.find_group(project_id, group_display_name)
+        except RuntimeError:
+            pass
+        try:
+            descriptor = self._graph_client.get_descriptor(project_id)
+            creation = GraphGroup(
+                display_name=group_display_name,
+                description=description,
+            )
+            return self._graph_client.create_group(creation, scope_descriptor=descriptor.value)
+        except AzureDevOpsServiceError as e:
+            raise RuntimeError(f"Failed to create group '{group_display_name}': {e}") from e
 
     def list_members(self, project_id: str, group_display_name: str) -> list:
         """List all members of the named group in the given project."""

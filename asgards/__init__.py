@@ -1,7 +1,11 @@
 """Asgards public package API."""
 
 from asgards.src.branch import BranchClient
-from asgards.src.member import MemberClient
+from asgards.src.member import (
+    GROUP_PROJECT_MANAGER,
+    GROUP_PROJECT_MEMBER,
+    MemberClient,
+)
 from asgards.src.pipeline import PipelineClient
 from asgards.src.project import ProjectClient
 from asgards.src.release import ReleaseClient
@@ -16,4 +20,6 @@ __all__ = [
     "PipelineClient",
     "ReleaseClient",
     "BranchClient",
+    "GROUP_PROJECT_MANAGER",
+    "GROUP_PROJECT_MEMBER",
 ]
