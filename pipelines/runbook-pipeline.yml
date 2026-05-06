@@ -22,34 +22,34 @@ parameters:
   default: 'CI Pipeline'
 
 - name: managers
-  displayName: Project Manager emails (空白分隔，create_project 用)
+  displayName: Project Manager emails (空白分隔，不需要請填 N/A)
   type: string
-  default: ''
+  default: 'N/A'
 
 - name: members
-  displayName: Project Member emails (空白分隔，create_project 用)
+  displayName: Project Member emails (空白分隔，不需要請填 N/A)
   type: string
-  default: ''
+  default: 'N/A'
 
 - name: add_manager
-  displayName: 新增 Project Manager emails (modify_member 用)
+  displayName: 新增 Project Manager emails (不需要請填 N/A)
   type: string
-  default: ''
+  default: 'N/A'
 
 - name: remove_manager
-  displayName: 移除 Project Manager emails (modify_member 用)
+  displayName: 移除 Project Manager emails (不需要請填 N/A)
   type: string
-  default: ''
+  default: 'N/A'
 
 - name: add_member
-  displayName: 新增 Project Member emails (modify_member 用)
+  displayName: 新增 Project Member emails (不需要請填 N/A)
   type: string
-  default: ''
+  default: 'N/A'
 
 - name: remove_member
-  displayName: 移除 Project Member emails (modify_member 用)
+  displayName: 移除 Project Member emails (不需要請填 N/A)
   type: string
-  default: ''
+  default: 'N/A'
 
 steps:
 - script: |
@@ -61,14 +61,12 @@ steps:
       ERRORS="$ERRORS\n  - 專案名稱 為必填"
     fi
 
-    # managers / members 為選填，空白時 create_project 跳過加人步驟
-
     if [ "$RUNBOOK" = "modify_member" ]; then
       ADD_MANAGER="${{ parameters.add_manager }}"
       REMOVE_MANAGER="${{ parameters.remove_manager }}"
       ADD_MEMBER="${{ parameters.add_member }}"
       REMOVE_MEMBER="${{ parameters.remove_member }}"
-      if [ -z "$ADD_MANAGER" ] && [ -z "$REMOVE_MANAGER" ] && [ -z "$ADD_MEMBER" ] && [ -z "$REMOVE_MEMBER" ]; then
+      if [ "$ADD_MANAGER" = "N/A" ] && [ "$REMOVE_MANAGER" = "N/A" ] && [ "$ADD_MEMBER" = "N/A" ] && [ "$REMOVE_MEMBER" = "N/A" ]; then
         ERRORS="$ERRORS\n  - modify_member 至少需填寫一個欄位（新增/移除 Manager 或 Member）"
       fi
     fi
@@ -92,8 +90,8 @@ steps:
 
 - ${{ if eq(parameters.runbook, 'create_project') }}:
   - script: |
-      [ -n "$MANAGERS" ] && MANAGERS_FLAG="--managers $MANAGERS" || MANAGERS_FLAG=""
-      [ -n "$MEMBERS" ]  && MEMBERS_FLAG="--members $MEMBERS"    || MEMBERS_FLAG=""
+      [ "$MANAGERS" != "N/A" ] && MANAGERS_FLAG="--managers $MANAGERS" || MANAGERS_FLAG=""
+      [ "$MEMBERS" != "N/A" ]  && MEMBERS_FLAG="--members $MEMBERS"    || MEMBERS_FLAG=""
       python runbooks/create_project.py \
         --project "$PROJECT_NAME" \
         --pipeline-name "$PIPELINE_NAME" \
@@ -110,10 +108,10 @@ steps:
 
 - ${{ if eq(parameters.runbook, 'modify_member') }}:
   - script: |
-      [ -n "$ADD_MANAGER" ]    && ADD_MANAGER_FLAG="--add-manager $ADD_MANAGER"          || ADD_MANAGER_FLAG=""
-      [ -n "$REMOVE_MANAGER" ] && REMOVE_MANAGER_FLAG="--remove-manager $REMOVE_MANAGER" || REMOVE_MANAGER_FLAG=""
-      [ -n "$ADD_MEMBER" ]     && ADD_MEMBER_FLAG="--add-member $ADD_MEMBER"             || ADD_MEMBER_FLAG=""
-      [ -n "$REMOVE_MEMBER" ]  && REMOVE_MEMBER_FLAG="--remove-member $REMOVE_MEMBER"    || REMOVE_MEMBER_FLAG=""
+      [ "$ADD_MANAGER" != "N/A" ]    && ADD_MANAGER_FLAG="--add-manager $ADD_MANAGER"          || ADD_MANAGER_FLAG=""
+      [ "$REMOVE_MANAGER" != "N/A" ] && REMOVE_MANAGER_FLAG="--remove-manager $REMOVE_MANAGER" || REMOVE_MANAGER_FLAG=""
+      [ "$ADD_MEMBER" != "N/A" ]     && ADD_MEMBER_FLAG="--add-member $ADD_MEMBER"             || ADD_MEMBER_FLAG=""
+      [ "$REMOVE_MEMBER" != "N/A" ]  && REMOVE_MEMBER_FLAG="--remove-member $REMOVE_MEMBER"    || REMOVE_MEMBER_FLAG=""
       python runbooks/modify_member.py \
         --project "$PROJECT_NAME" \
         $ADD_MANAGER_FLAG \
