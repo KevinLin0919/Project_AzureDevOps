@@ -1,0 +1,103 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+- name: runbook
+  displayName: 選擇 Runbook
+  type: string
+  values:
+    - create_project
+    - modify_member
+
+- name: project_name
+  displayName: 專案名稱
+  type: string
+  default: ''
+
+- name: pipeline_name
+  displayName: Pipeline 名稱 (create_project 用)
+  type: string
+  default: 'CI Pipeline'
+
+- name: managers
+  displayName: Project Manager emails (空白分隔，create_project 用)
+  type: string
+  default: ''
+
+- name: members
+  displayName: Project Member emails (空白分隔，create_project 用)
+  type: string
+  default: ''
+
+- name: add_manager
+  displayName: 新增 Project Manager emails (modify_member 用)
+  type: string
+  default: ''
+
+- name: remove_manager
+  displayName: 移除 Project Manager emails (modify_member 用)
+  type: string
+  default: ''
+
+- name: add_member
+  displayName: 新增 Project Member emails (modify_member 用)
+  type: string
+  default: ''
+
+- name: remove_member
+  displayName: 移除 Project Member emails (modify_member 用)
+  type: string
+  default: ''
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.11'
+  displayName: 'Use Python 3.11'
+
+- script: |
+    pip install -r asgards/requirements.txt
+    pip install -e asgards/
+  displayName: 'Install asgards package'
+
+- ${{ if eq(parameters.runbook, 'create_project') }}:
+  - script: |
+      [ -n "$MANAGERS" ] && MANAGERS_FLAG="--managers $MANAGERS" || MANAGERS_FLAG=""
+      [ -n "$MEMBERS" ]  && MEMBERS_FLAG="--members $MEMBERS"    || MEMBERS_FLAG=""
+      python runbooks/create_project.py \
+        --project "$PROJECT_NAME" \
+        --pipeline-name "$PIPELINE_NAME" \
+        $MANAGERS_FLAG \
+        $MEMBERS_FLAG
+    displayName: 'Run create_project runbook'
+    env:
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
+      AZURE_DEVOPS_ORG_URL: $(AZURE_DEVOPS_ORG_URL)
+      PROJECT_NAME: ${{ parameters.project_name }}
+      PIPELINE_NAME: ${{ parameters.pipeline_name }}
+      MANAGERS: ${{ parameters.managers }}
+      MEMBERS: ${{ parameters.members }}
+
+- ${{ if eq(parameters.runbook, 'modify_member') }}:
+  - script: |
+      [ -n "$ADD_MANAGER" ]    && ADD_MANAGER_FLAG="--add-manager $ADD_MANAGER"          || ADD_MANAGER_FLAG=""
+      [ -n "$REMOVE_MANAGER" ] && REMOVE_MANAGER_FLAG="--remove-manager $REMOVE_MANAGER" || REMOVE_MANAGER_FLAG=""
+      [ -n "$ADD_MEMBER" ]     && ADD_MEMBER_FLAG="--add-member $ADD_MEMBER"             || ADD_MEMBER_FLAG=""
+      [ -n "$REMOVE_MEMBER" ]  && REMOVE_MEMBER_FLAG="--remove-member $REMOVE_MEMBER"    || REMOVE_MEMBER_FLAG=""
+      python runbooks/modify_member.py \
+        --project "$PROJECT_NAME" \
+        $ADD_MANAGER_FLAG \
+        $REMOVE_MANAGER_FLAG \
+        $ADD_MEMBER_FLAG \
+        $REMOVE_MEMBER_FLAG
+    displayName: 'Run modify_member runbook'
+    env:
+      AZURE_DEVOPS_PAT: $(AZURE_DEVOPS_PAT)
+      AZURE_DEVOPS_ORG_URL: $(AZURE_DEVOPS_ORG_URL)
+      PROJECT_NAME: ${{ parameters.project_name }}
+      ADD_MANAGER: ${{ parameters.add_manager }}
+      REMOVE_MANAGER: ${{ parameters.remove_manager }}
+      ADD_MEMBER: ${{ parameters.add_member }}
+      REMOVE_MEMBER: ${{ parameters.remove_member }}
