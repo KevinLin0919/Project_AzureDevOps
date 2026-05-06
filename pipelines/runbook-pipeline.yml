@@ -52,6 +52,34 @@ parameters:
   default: ''
 
 steps:
+- script: |
+    RUNBOOK="${{ parameters.runbook }}"
+    PROJECT_NAME="${{ parameters.project_name }}"
+    ERRORS=""
+
+    if [ -z "$PROJECT_NAME" ]; then
+      ERRORS="$ERRORS\n  - 專案名稱 為必填"
+    fi
+
+    # managers / members 為選填，空白時 create_project 跳過加人步驟
+
+    if [ "$RUNBOOK" = "modify_member" ]; then
+      ADD_MANAGER="${{ parameters.add_manager }}"
+      REMOVE_MANAGER="${{ parameters.remove_manager }}"
+      ADD_MEMBER="${{ parameters.add_member }}"
+      REMOVE_MEMBER="${{ parameters.remove_member }}"
+      if [ -z "$ADD_MANAGER" ] && [ -z "$REMOVE_MANAGER" ] && [ -z "$ADD_MEMBER" ] && [ -z "$REMOVE_MEMBER" ]; then
+        ERRORS="$ERRORS\n  - modify_member 至少需填寫一個欄位（新增/移除 Manager 或 Member）"
+      fi
+    fi
+
+    if [ -n "$ERRORS" ]; then
+      echo "##[error]必填欄位未填寫：$(printf "$ERRORS")"
+      exit 1
+    fi
+    echo "參數驗證通過 ✓"
+  displayName: 'Validate parameters'
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.11'
