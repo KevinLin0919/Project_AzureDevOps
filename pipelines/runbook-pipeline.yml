@@ -22,32 +22,32 @@ parameters:
   default: 'CI Pipeline'
 
 - name: managers
-  displayName: Project Manager emails (空白分隔，不需要請填 N/A)
+  displayName: '[create_project] Project Manager emails｜可填多位，空白分隔，如：a@co.com b@co.com｜不需要請填 N/A'
   type: string
   default: 'N/A'
 
 - name: members
-  displayName: Project Member emails (空白分隔，不需要請填 N/A)
+  displayName: '[create_project] Project Member emails｜可填多位，空白分隔，如：a@co.com b@co.com｜不需要請填 N/A'
   type: string
   default: 'N/A'
 
 - name: add_manager
-  displayName: 新增 Project Manager emails (不需要請填 N/A)
+  displayName: '[modify_member] 新增 Project Manager emails｜可填多位，空白分隔｜不需要請填 N/A'
   type: string
   default: 'N/A'
 
 - name: remove_manager
-  displayName: 移除 Project Manager emails (不需要請填 N/A)
+  displayName: '[modify_member] 移除 Project Manager emails｜可填多位，空白分隔｜不需要請填 N/A'
   type: string
   default: 'N/A'
 
 - name: add_member
-  displayName: 新增 Project Member emails (不需要請填 N/A)
+  displayName: '[modify_member] 新增 Project Member emails｜可填多位，空白分隔｜不需要請填 N/A'
   type: string
   default: 'N/A'
 
 - name: remove_member
-  displayName: 移除 Project Member emails (不需要請填 N/A)
+  displayName: '[modify_member] 移除 Project Member emails｜可填多位，空白分隔｜不需要請填 N/A'
   type: string
   default: 'N/A'
 
